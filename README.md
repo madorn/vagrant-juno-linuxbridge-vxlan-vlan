@@ -19,9 +19,9 @@ Get Started
 ``git clone https://github.com/madorn/vagrant-juno-linuxbridge-vxlan.git`` <br /> 
 
 **For Virtualbox** <br />
-Ensure you have default host-only vboxnet0 network (192.168.56.0/24)
+Ensure you have default host-only vboxnet0 network (192.168.56.0/24) <br /> 
 ``vagrant up --provider virtualbox --provision``
 
 **For Virtualbox** <br />
-Ensure you have default host-only vmnet1 network (172.16.99.0/24)
+Ensure you have default host-only vmnet1 network (172.16.99.0/24) <br /> 
 ``vagrant up --provider vmware_fusion --provision``
