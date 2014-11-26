@@ -94,9 +94,7 @@ sudo service neutron-plugin-linuxbridge-agent start
 
 ### Nova
 
-if !egrep 'vmx|svm' /proc/cpuinfo  > /dev/null 2>&1 ; then
-sudo apt-get install -y nova-compute-qemu
-else
+if egrep 'vmx|svm' /proc/cpuinfo  > /dev/null 2>&1 ; then
 sudo apt-get install -y nova-compute
 sudo modprobe kvm
 sudo modprobe kvm_intel
@@ -104,6 +102,8 @@ cat <<EOF | sudo tee -a /etc/modules
 kvm
 kvm_intel
 EOF
+else
+sudo apt-get install -y nova-compute-qemu
 fi
 
 cat <<EOF | sudo tee -a /etc/nova/nova.conf
