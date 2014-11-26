@@ -293,7 +293,6 @@ sleep 15
 
 source ~/credentials/user
 
-
 neutron net-create private
 PRIVATE_NET_ID=`neutron net-show private | awk '/ id / { print $4 }'`
 neutron subnet-create --name private-subnet1 $PRIVATE_NET_ID 10.0.0.0/29
@@ -301,12 +300,12 @@ PRIVATE_SUBNET1_ID=`neutron subnet-show private-subnet1 | awk '/ id / { print $4
 
 ### Cinder
 
-source ~/credentials/admin
-
 sudo apt-get install -y cinder-api cinder-scheduler
 
 sudo service cinder-api stop
 sudo service cinder-scheduler stop
+
+source ~/credentials/admin
 
 keystone user-create --tenant-id $SERVICE_TENANT_ID --name cinder --pass notcinder
 CINDER_USER_ID=`keystone user-get cinder | awk '/ id / { print $4 }'`
