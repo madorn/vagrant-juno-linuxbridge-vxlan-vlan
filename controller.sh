@@ -2,6 +2,19 @@
 
 ### Configuration
 
+ETH1=`hostname -I | cut -f2 -d' '`
+
+if [ $ETH1 = 192.168.56.56 ];then
+export MY_IP=192.168.56.56
+export RABBITMQ_IP=192.168.56.56
+export MYSQL_IP=192.168.56.56
+export KEYSTONE_IP=192.168.56.56
+export GLANCE_IP=192.168.56.56
+export NEUTRON_IP=192.168.56.56
+export NOVA_IP=192.168.56.56
+export CINDER_IP=192.168.56.56
+export HORIZON_IP=192.168.56.56
+else
 export MY_IP=172.16.99.100
 export RABBITMQ_IP=172.16.99.100
 export MYSQL_IP=172.16.99.100
@@ -11,6 +24,7 @@ export NEUTRON_IP=172.16.99.100
 export NOVA_IP=172.16.99.100
 export CINDER_IP=172.16.99.100
 export HORIZON_IP=172.16.99.100
+fi
 
 ### Synchronize time
 
@@ -290,13 +304,6 @@ sudo neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /et
 
 sudo service neutron-server start
 sleep 15
-
-source ~/credentials/user
-
-neutron net-create private
-PRIVATE_NET_ID=`neutron net-show private | awk '/ id / { print $4 }'`
-neutron subnet-create --name private-subnet1 $PRIVATE_NET_ID 10.0.0.0/29
-PRIVATE_SUBNET1_ID=`neutron subnet-show private-subnet1 | awk '/ id / { print $4 }'`
 
 ### Cinder
 

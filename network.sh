@@ -2,6 +2,19 @@
 
 ### Configuration
 
+ETH1=`hostname -I | cut -f2 -d' '`
+
+if [ $ETH1 = 192.168.56.57 ];then
+export MY_IP=192.168.56.57
+export RABBITMQ_IP=192.168.56.56
+export MYSQL_IP=192.168.56.56
+export KEYSTONE_IP=192.168.56.56
+export GLANCE_IP=192.168.56.56
+export NEUTRON_IP=192.168.56.56
+export NOVA_IP=192.168.56.56
+export CINDER_IP=192.168.56.56
+export HORIZON_IP=192.168.56.56
+else
 export MY_IP=172.16.99.101
 export RABBITMQ_IP=172.16.99.100
 export MYSQL_IP=172.16.99.100
@@ -11,6 +24,7 @@ export NEUTRON_IP=172.16.99.100
 export NOVA_IP=172.16.99.100
 export CINDER_IP=172.16.99.100
 export HORIZON_IP=172.16.99.100
+fi
 
 export NEUTRON_EXTERNAL_NETWORK_INTERFACE=eth2
 
@@ -44,6 +58,9 @@ ip link set dev $NEUTRON_EXTERNAL_NETWORK_INTERFACE up
 EOF
 sudo chmod +x /etc/network/if-up.d/neutron
 sudo /etc/network/if-up.d/neutron
+
+sudo brctl addbr br-ex
+sudo brctl addif br-ex eth2
 
 export SERVICE_TOKEN=ADMIN
 export SERVICE_ENDPOINT=http://$KEYSTONE_IP:35357/v2.0
