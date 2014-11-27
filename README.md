@@ -37,6 +37,10 @@ Verify that you have default host-only vmnet1 network (172.16.99.0/24) <br />
 
 ``vagrant ssh node1``
 
+** Switch to Root**
+
+``su -`` password: vagrant
+
 **Source credentials**
 
 ``source ~/credentials/admin``
