@@ -15,7 +15,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     node1.vm.provider "vmware_fusion" do |vf, override|
 	override.vm.network "private_network", ip: "172.16.99.100"
         vf.vmx["numvcpus"] = "1"
-        vf.vmx["memsize"] = "2048"
+        vf.vmx["memsize"] = "1024"
         vf.vmx["vhv.enable"] = "TRUE"
 	vf.vmx["ethernet1.present"] = "TRUE"
     	vf.vmx["ethernet1.connectionType"] = "hostonly"
@@ -28,7 +28,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    node1.vm.provider "virtualbox" do |vb, override|
 	override.vm.network "private_network", ip: "192.168.56.56"
         vb.customize [ "modifyvm", :id, "--cpus", "1" ]
-        vb.customize [ "modifyvm", :id, "--memory", "2048" ]
+        vb.customize [ "modifyvm", :id, "--memory", "1024" ]
 	vb.customize [ "modifyvm", :id, "--hostonlyadapter2", "vboxnet0"]
    end
    node1.vm.provision :shell, path: "controller.sh"
@@ -42,7 +42,7 @@ end
         override.vm.network "private_network", ip: "172.16.99.101"
 	override.vm.network "private_network", type: "dhcp"
         vf.vmx["numvcpus"] = "1"
-        vf.vmx["memsize"] = "2048"
+        vf.vmx["memsize"] = "1024"
         vf.vmx["vhv.enable"] = "TRUE"
         vf.vmx["ethernet1.present"] = "TRUE"
         vf.vmx["ethernet1.connectionType"] = "hostonly"
@@ -60,7 +60,7 @@ end
         override.vm.network "private_network", ip: "192.168.56.57"
         override.vm.network "private_network", type: "dhcp"
         vb.customize [ "modifyvm", :id, "--cpus", "1" ]
-        vb.customize [ "modifyvm", :id, "--memory", "2048" ]
+        vb.customize [ "modifyvm", :id, "--memory", "1024" ]
         vb.customize [ "modifyvm", :id, "--hostonlyadapter2", "vboxnet0"]
         vb.customize [ "modifyvm", :id, "--nic3", "nat"]
   end
@@ -75,7 +75,7 @@ end
 node3.vm.provider "vmware_fusion" do |vf, override|
         override.vm.network "private_network", ip: "172.16.99.102"
         vf.vmx["numvcpus"] = "1"
-        vf.vmx["memsize"] = "2048"
+        vf.vmx["memsize"] = "1024"
         vf.vmx["vhv.enable"] = "TRUE"
         vf.vmx["ethernet1.present"] = "TRUE"
         vf.vmx["ethernet1.connectionType"] = "hostonly"
@@ -88,7 +88,7 @@ node3.vm.provider "vmware_fusion" do |vf, override|
    node3.vm.provider "virtualbox" do |vb, override|
         override.vm.network "private_network", ip: "192.168.56.58"
         vb.customize [ "modifyvm", :id, "--cpus", "1" ]
-        vb.customize [ "modifyvm", :id, "--memory", "2048" ]
+        vb.customize [ "modifyvm", :id, "--memory", "1024" ]
         vb.customize [ "modifyvm", :id, "--hostonlyadapter2", "vboxnet0"]
     end
     node3.vm.provision :shell, path: "compute.sh"
