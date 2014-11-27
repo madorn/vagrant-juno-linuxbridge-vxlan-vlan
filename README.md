@@ -10,7 +10,7 @@ Features
 Minimum Requirements
 ---------------------
 * [Vagrant](http://www.vagrantup.com)
-* 15GB hard drive space
+* 8GB hard drive space
 * At least 3GB available RAM
 
 Get Started
