@@ -30,7 +30,7 @@ export NEUTRON_EXTERNAL_NETWORK_INTERFACE=eth2
 
 ### Synchronize time
 
-sudo ntpdate -u ntp.ubuntu.com
+sudo ntpdate -u ntp.ubuntu.com | true
 
 ### Juno (run these one at a time)
 
