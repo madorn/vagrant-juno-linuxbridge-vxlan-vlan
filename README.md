@@ -65,13 +65,13 @@ Verify that you have default host-only vmnet1 network (172.16.99.0/24) <br />
 
 ``neutron net-create public --router:external True --provider:network_type flat --provider:physical_network physnet1``<br /> 
 
-``neutron subnet-create --name public-subnet --gateway 10.0.4.2 --allocation-pool start=10.0.4.100,end=10.0.4.200 --disable-dhcp <public_network_id> 10.0.4.0/24``
+``neutron subnet-create --name public-subnet --gateway 10.0.4.2 --allocation-pool start=10.0.4.100,end=10.0.4.200 --disable-dhcp public 10.0.4.0/24``
 
 **Create an external network for the internet gateway (VMware Fusion)** <br /> 
 
 ``neutron net-create public --router:external True --provider:network_type flat --provider:physical_network physnet1``<br /> 
 
-``neutron subnet-create --name public-subnet --gateway 192.168.13.2 --allocation-pool start=192.168.13.100,end=192.168.13.200 --disable-dhcp <public_network_id> 192.168.13.0/24``
+``neutron subnet-create --name public-subnet --gateway 192.168.13.2 --allocation-pool start=192.168.13.100,end=192.168.13.200 --disable-dhcp public 192.168.13.0/24``
 
 **Create a router**
 
@@ -79,8 +79,8 @@ Verify that you have default host-only vmnet1 network (172.16.99.0/24) <br />
 
 **Add private-network to the router**
 
-``neutron router-interface-add <router_id> <private-subnet_id>``
+``neutron router-interface-add myrouter <private-subnet_id>``
 
 **Set public-network as the default gateway**
 
-``neutron router-gateway-set <router_id> <public-network_id>``
+``neutron router-gateway-set myrouter <public-network_id>``
