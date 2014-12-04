@@ -77,7 +77,7 @@ Verify that you have default host-only vmnet1 network (172.16.99.0/24) <br />
 
 ``neutron router-create myrouter``
 
-**Add private-network to the router**
+**Add private-subnet to the router**
 
 ``neutron router-interface-add myrouter private-subnet``
 
