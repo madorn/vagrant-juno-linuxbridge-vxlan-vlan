@@ -11,7 +11,7 @@ Minimum Requirements
 ---------------------
 * [Vagrant](http://www.vagrantup.com)
 * 8GB hard drive space
-* At least 3GB RAM to allocate to environment
+* At least 4GB RAM to allocate to environment
 
 Get Started
 ------------
