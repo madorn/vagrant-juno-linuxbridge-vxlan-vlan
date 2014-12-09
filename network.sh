@@ -113,6 +113,10 @@ EOF
 sudo sed -i 's/# interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver/interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver/g' /etc/neutron/dhcp_agent.ini
 sudo sed -i 's/# enable_isolated_metadata = False/enable_isolated_metadata = True/g' /etc/neutron/dhcp_agent.ini
 sudo sed -i 's/# enable_metadata_network = False/enable_metadata_network = True/g' /etc/neutron/dhcp_agent.ini
+sudo sed -i 's|# dnsmasq_config_file =|dnsmasq_config_file = /etc/neutron/dnsmasq-neutron.conf|g' /etc/neutron/dhcp_agent.ini
+cat <<EOF | sudo tee /etc/neutron/dnsmasq-neutron.conf
+dhcp-option-force=26,1450
+EOF
 
 # Configure Neutron L3 Agent
 sudo sed -i 's/# interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver/interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver/g' /etc/neutron/l3_agent.ini
