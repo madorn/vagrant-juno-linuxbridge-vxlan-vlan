@@ -15,7 +15,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     node1.vm.provider "vmware_fusion" do |vf, override|
 	override.vm.network "private_network", ip: "172.16.99.100"
         vf.vmx["numvcpus"] = "1"
-        vf.vmx["memsize"] = "1024"
+        vf.vmx["memsize"] = "2048"
         vf.vmx["vhv.enable"] = "TRUE"
 	vf.vmx["ethernet1.present"] = "TRUE"
     	vf.vmx["ethernet1.connectionType"] = "hostonly"
@@ -28,7 +28,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    node1.vm.provider "virtualbox" do |vb, override|
 	override.vm.network "private_network", ip: "192.168.56.56"
         vb.customize [ "modifyvm", :id, "--cpus", "1" ]
-        vb.customize [ "modifyvm", :id, "--memory", "1024" ]
+        vb.customize [ "modifyvm", :id, "--memory", "2048" ]
 	vb.customize [ "modifyvm", :id, "--hostonlyadapter2", "vboxnet0"]
    end
    node1.vm.provision :shell, path: "controller.sh"
