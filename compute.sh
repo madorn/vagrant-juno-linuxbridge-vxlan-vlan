@@ -186,10 +186,8 @@ admin_user = cinder
 admin_password = notcinder
 EOF
 
-echo "Creating 1TB Cinder Volumes"
 CINDER0="/opt/cinder0.img"
 CINDER1="/opt/cinder1.img"
-if [ ! "$(losetup -a | grep /opt/cinder*.img)" ];then
 LOOP0=$(losetup -f)
 dd if=/dev/zero of=${CINDER0} bs=1 count=0 seek=1000G
 losetup ${LOOP0} ${CINDER0}
@@ -201,7 +199,6 @@ pvcreate ${LOOP1}
 vgcreate cinder-volumes-sata ${LOOP0}
 vgcreate cinder-volumes-ssd ${LOOP1}
 pvscan
-fi
 
 sudo service tgt start
 sudo service cinder-volume start
