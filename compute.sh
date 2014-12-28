@@ -78,7 +78,6 @@ tunnel_types = vxlan
 vxlan_udp_port = 4789
 
 [linux_bridge]
-physical_interface_mappings = physnet1:eth2
 
 [l2pop]
 agent_boot_time = 180
