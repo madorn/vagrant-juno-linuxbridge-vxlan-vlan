@@ -59,10 +59,6 @@ EOF
 sudo chmod +x /etc/network/if-up.d/neutron
 sudo /etc/network/if-up.d/neutron
 
-sudo brctl addbr br-ex
-sudo brctl addif br-ex eth2
-sudo ip link set dev br-ex up
-
 export SERVICE_TOKEN=ADMIN
 export SERVICE_ENDPOINT=http://$KEYSTONE_IP:35357/v2.0
 
@@ -99,7 +95,7 @@ tunnel_types = vxlan
 vxlan_udp_port = 4789
 
 [linux_bridge]
-physical_interface_mappings = physnet1:br-ex
+physical_interface_mappings = physnet1:eth2
 
 [l2pop]
 agent_boot_time = 180
