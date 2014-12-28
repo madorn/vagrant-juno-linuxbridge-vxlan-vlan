@@ -118,6 +118,9 @@ EOF
 # Configure Neutron L3 Agent
 sudo sed -i 's/# interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver/interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver/g' /etc/neutron/l3_agent.ini
 sudo sed -i 's/# use_namespaces = True/use_namespaces = True/g' /etc/neutron/l3_agent.ini
+sudo sed -i 's/# external_network_bridge =/external_network_bridge =/g' /etc/neutron/l3_agent.ini
+
+
 
 # Configure Neutron Metadata Agent
 sudo sed -i "s/# nova_metadata_ip = 127.0.0.1/nova_metadata_ip = $MY_IP/g" /etc/neutron/metadata_agent.ini
