@@ -285,11 +285,11 @@ sudo sed -i 's|# enable_security_group = True|firewall_driver = neutron.agent.li
 ( cat | sudo tee -a /etc/neutron/plugins/ml2/ml2_conf.ini ) <<EOF
 
 [agent]
-l2population = True
-tunnel_type = vxlan
+tunnel_types = vxlan
+vxlan_udp_port = 4789
 
-[linuxbridge]
-physical_interface_mappings = physnet1:br-ex
+[linux_bridge]
+physical_interface_mappings = physnet1:eth2
 
 [l2pop]
 agent_boot_time = 180
