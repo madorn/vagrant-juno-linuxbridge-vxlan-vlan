@@ -61,6 +61,7 @@ sudo /etc/network/if-up.d/neutron
 
 sudo brctl addbr br-ex
 sudo brctl addif br-ex eth2
+sudo ip link set dev br-ex up
 
 export SERVICE_TOKEN=ADMIN
 export SERVICE_ENDPOINT=http://$KEYSTONE_IP:35357/v2.0
