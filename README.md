@@ -49,7 +49,7 @@ Verify that you have default host-only vmnet1 network (172.16.99.0/24) <br />
 
 ``neutron net-create private`` <br />
 
-``neutron subnet-create --name private-subnet private 10.0.0.0/29``
+``neutron subnet-create --name private-subnet private 10.0.0.0/29 --dns-nameserver 8.8.8.8``
 
 **Boot Instance**
 
