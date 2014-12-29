@@ -3,9 +3,9 @@ OpenStack Juno Deployment with Vagrant (Linux-Bridge + VXLAN)
 Features
 ------------
 * Three Nodes (Controller, Network, Compute) - Ubuntu 14.04
-* Linux-Bridge with VXLAN tunneling
+* Linux-Bridge with VXLAN and VLAN tenant-networks
 * Works with VMware Fusion or VirtualBox
-* Network node includes internet gateway (eth2 buried into br-ex bridge)
+* Network node includes internet gateway (eth2)
 
 Minimum Requirements
 ---------------------
