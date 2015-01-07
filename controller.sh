@@ -28,13 +28,13 @@ fi
 
 ### Synchronize time
 
-sudo ntpdate -u ntp.ubuntu.com | true
+ntpdate -u ntp.ubuntu.com | true
 
 ### Create creds file
 
 mkdir ~/credentials
 
-cat <<EOF | sudo tee ~/credentials/user
+cat <<EOF | tee ~/credentials/user
 export OS_USERNAME=myuser
 export OS_PASSWORD=mypassword
 export OS_TENANT_NAME=MyProject
@@ -42,7 +42,7 @@ export OS_AUTH_URL=http://$MY_IP:5000/v2.0/
 export OS_REGION_NAME=RegionOne
 EOF
 
-cat <<EOF | sudo tee ~/credentials/admin
+cat <<EOF | tee ~/credentials/admin
 export OS_USERNAME=myadmin
 export OS_PASSWORD=mypassword
 export OS_TENANT_NAME=MyProject
@@ -52,53 +52,53 @@ EOF
 
 ### Juno
 
-sudo apt-get install -y ubuntu-cloud-keyring software-properties-common
+apt-get install -y ubuntu-cloud-keyring software-properties-common
 
-sudo add-apt-repository -y cloud-archive:juno
+add-apt-repository -y cloud-archive:juno
 
-sudo apt-get update
+apt-get update
 
 ### RabbitMQ
 
-sudo apt-get install -y rabbitmq-server
+apt-get install -y rabbitmq-server
 
-sudo mkdir /etc/rabbitmq/rabbitmq.conf.d
-cat <<EOF | sudo tee /etc/rabbitmq/rabbitmq.conf.d/rabbitmq-listen.conf
+mkdir /etc/rabbitmq/rabbitmq.conf.d
+cat <<EOF | tee /etc/rabbitmq/rabbitmq.conf.d/rabbitmq-listen.conf
 RABBITMQ_NODE_IP_ADDRESS=$RABBITMQ_IP
 EOF
-sudo chmod 644 /etc/rabbitmq/rabbitmq.conf.d/rabbitmq-listen.conf
+chmod 644 /etc/rabbitmq/rabbitmq.conf.d/rabbitmq-listen.conf
 
-sudo service rabbitmq-server restart
+service rabbitmq-server restart
 
 ### MariaDB
 
-cat <<EOF | sudo debconf-set-selections
+cat <<EOF | debconf-set-selections
 mysql-server-5.1 mysql-server/root_password password notmysql
 mysql-server-5.1 mysql-server/root_password_again password notmysql
 mysql-server-5.1 mysql-server/start_on_boot boolean true
 EOF
 
-sudo apt-get install -y mariadb-server python-mysqldb
+apt-get install -y mariadb-server python-mysqldb
 
-sudo sed -i "s/127.0.0.1/$MYSQL_IP\ndefault-storage-engine = innodb\ninnodb_file_per_table\ncollation-server = utf8_general_ci\ncharacter-set-server = utf8\\ninit-connect = 'SET NAMES utf8'/g" /etc/mysql/my.cnf
+sed -i "s/127.0.0.1/$MYSQL_IP\ndefault-storage-engine = innodb\ninnodb_file_per_table\ncollation-server = utf8_general_ci\ncharacter-set-server = utf8\\ninit-connect = 'SET NAMES utf8'/g" /etc/mysql/my.cnf
 
-sudo service mysql restart
+service mysql restart
 
 ### Keystone
 
-sudo apt-get install -y keystone
+apt-get install -y keystone
 
-sudo service keystone stop
+service keystone stop
 
 mysql -u root -pnotmysql -e "CREATE DATABASE keystone;"
 mysql -u root -pnotmysql -e "GRANT ALL ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY 'notkeystone';"
 mysql -u root -pnotmysql -e "GRANT ALL ON keystone.* TO 'keystone'@'%' IDENTIFIED BY 'notkeystone';"
 
-sudo sed -i "s|connection=sqlite:////var/lib/keystone/keystone.db|connection=mysql://keystone:notkeystone@$MYSQL_IP/keystone|g" /etc/keystone/keystone.conf
+sed -i "s|connection=sqlite:////var/lib/keystone/keystone.db|connection=mysql://keystone:notkeystone@$MYSQL_IP/keystone|g" /etc/keystone/keystone.conf
 
-sudo keystone-manage db_sync
+keystone-manage db_sync
 
-sudo service keystone start
+service keystone start
 sleep 15
 
 export SERVICE_TOKEN=ADMIN
@@ -122,10 +122,10 @@ keystone endpoint-create --region RegionOne --service-id=$KEYSTONE_SVC_ID --publ
 
 ### Glance
 
-sudo apt-get install -y glance
+apt-get install -y glance
 
-sudo service glance-api stop
-sudo service glance-registry stop
+service glance-api stop
+service glance-registry stop
 
 keystone user-create --tenant-id $SERVICE_TENANT_ID --name glance --pass notglance
 GLANCE_USER_ID=`keystone user-get glance | awk '/ id / { print $4 }'`
@@ -140,25 +140,25 @@ mysql -u root -pnotmysql -e "GRANT ALL ON glance.* TO 'glance'@'localhost' IDENT
 mysql -u root -pnotmysql -e "GRANT ALL ON glance.* TO 'glance'@'%' IDENTIFIED BY 'notglance';"
 
 # Configure Glance-API
-sudo sed -i "s|#connection = <None>|connection = mysql://glance:notglance@$MY_IP/glance|g" /etc/glance/glance-api.conf
-sudo sed -i "s/rabbit_host = localhost/rabbit_host = $RABBITMQ_IP/g" /etc/glance/glance-api.conf
-sudo sed -i "s/identity_uri = http:\/\/127.0.0.1:35357/identity_uri = http:\/\/$KEYSTONE_IP:35357/g" /etc/glance/glance-api.conf
-sudo sed -i 's/%SERVICE_TENANT_NAME%/Services/g' /etc/glance/glance-api.conf
-sudo sed -i 's/%SERVICE_USER%/glance/g' /etc/glance/glance-api.conf
-sudo sed -i 's/%SERVICE_PASSWORD%/notglance/g' /etc/glance/glance-api.conf
-sudo sed -i 's/#flavor=/flavor = keystone/g' /etc/glance/glance-api.conf
-sudo sed -i 's/#show_image_direct_url = False/show_image_direct_url = True/g' /etc/glance/glance-api.conf
-sudo sed -i "s|#connection = <None>|connection = mysql://glance:notglance@$MYSQL_IP/glance|g" /etc/glance/glance-registry.conf
-sudo sed -i "s/identity_uri = http:\/\/127.0.0.1:35357/identity_uri = http:\/\/$KEYSTONE_IP:35357/g" /etc/glance/glance-registry.conf
-sudo sed -i 's/%SERVICE_TENANT_NAME%/Services/g' /etc/glance/glance-registry.conf
-sudo sed -i 's/%SERVICE_USER%/glance/g' /etc/glance/glance-registry.conf
-sudo sed -i 's/%SERVICE_PASSWORD%/notglance/g' /etc/glance/glance-registry.conf
-sudo sed -i 's/#flavor=/flavor = keystone/g' /etc/glance/glance-registry.conf
+sed -i "s|#connection = <None>|connection = mysql://glance:notglance@$MY_IP/glance|g" /etc/glance/glance-api.conf
+sed -i "s/rabbit_host = localhost/rabbit_host = $RABBITMQ_IP/g" /etc/glance/glance-api.conf
+sed -i "s/identity_uri = http:\/\/127.0.0.1:35357/identity_uri = http:\/\/$KEYSTONE_IP:35357/g" /etc/glance/glance-api.conf
+sed -i 's/%SERVICE_TENANT_NAME%/Services/g' /etc/glance/glance-api.conf
+sed -i 's/%SERVICE_USER%/glance/g' /etc/glance/glance-api.conf
+sed -i 's/%SERVICE_PASSWORD%/notglance/g' /etc/glance/glance-api.conf
+sed -i 's/#flavor=/flavor = keystone/g' /etc/glance/glance-api.conf
+sed -i 's/#show_image_direct_url = False/show_image_direct_url = True/g' /etc/glance/glance-api.conf
+sed -i "s|#connection = <None>|connection = mysql://glance:notglance@$MYSQL_IP/glance|g" /etc/glance/glance-registry.conf
+sed -i "s/identity_uri = http:\/\/127.0.0.1:35357/identity_uri = http:\/\/$KEYSTONE_IP:35357/g" /etc/glance/glance-registry.conf
+sed -i 's/%SERVICE_TENANT_NAME%/Services/g' /etc/glance/glance-registry.conf
+sed -i 's/%SERVICE_USER%/glance/g' /etc/glance/glance-registry.conf
+sed -i 's/%SERVICE_PASSWORD%/notglance/g' /etc/glance/glance-registry.conf
+sed -i 's/#flavor=/flavor = keystone/g' /etc/glance/glance-registry.conf
 
-sudo glance-manage db_sync
+glance-manage db_sync
 
-sudo service glance-registry start
-sudo service glance-api start
+service glance-registry start
+service glance-api start
 
 export OS_USERNAME=glance
 export OS_PASSWORD=notglance
@@ -173,14 +173,14 @@ glance image-create --name "cirros-qcow2" --disk-format qcow2 --container-format
 
 ### Nova
 
-sudo apt-get install -y nova-api nova-scheduler nova-conductor nova-cert nova-consoleauth nova-novncproxy
+apt-get install -y nova-api nova-scheduler nova-conductor nova-cert nova-consoleauth nova-novncproxy
 
-sudo service nova-api stop
-sudo service nova-scheduler stop
-sudo service nova-conductor stop
-sudo service nova-cert stop
-sudo service nova-consoleauth stop
-sudo service nova-novncproxy stop
+service nova-api stop
+service nova-scheduler stop
+service nova-conductor stop
+service nova-cert stop
+service nova-consoleauth stop
+service nova-novncproxy stop
 
 keystone user-create --tenant-id $SERVICE_TENANT_ID --name nova --pass notnova
 NOVA_USER_ID=`keystone user-get nova | awk '/ id / { print $4 }'`
@@ -194,7 +194,7 @@ mysql -u root -pnotmysql -e "CREATE DATABASE nova;"
 mysql -u root -pnotmysql -e "GRANT ALL ON nova.* TO 'nova'@'localhost' IDENTIFIED BY 'notnova';"
 mysql -u root -pnotmysql -e "GRANT ALL ON nova.* TO 'nova'@'%' IDENTIFIED BY 'notnova';"
 
-cat <<EOF | sudo tee -a /etc/nova/nova.conf
+cat <<EOF | tee -a /etc/nova/nova.conf
 network_api_class=nova.network.neutronv2.api.API
 neutron_url=http://$NEUTRON_IP:9696
 neutron_auth_strategy=keystone
@@ -231,20 +231,20 @@ admin_user = nova
 admin_password = notnova
 EOF
 
-sudo nova-manage db sync
+nova-manage db sync
 
-sudo service nova-api start
-sudo service nova-scheduler start
-sudo service nova-conductor start
-sudo service nova-cert start
-sudo service nova-consoleauth start
-sudo service nova-novncproxy start
+service nova-api start
+service nova-scheduler start
+service nova-conductor start
+service nova-cert start
+service nova-consoleauth start
+service nova-novncproxy start
 
 ### Neutron
 
-sudo apt-get install -y neutron-server neutron-plugin-ml2
+apt-get install -y neutron-server neutron-plugin-ml2
 
-sudo service neutron-server stop
+service neutron-server stop
 
 keystone user-create --tenant-id $SERVICE_TENANT_ID --name neutron --pass notneutron
 NEUTRON_USER_ID=`keystone user-get neutron | awk '/ id / { print $4 }'`
@@ -258,33 +258,33 @@ mysql -u root -pnotmysql -e "CREATE DATABASE neutron;"
 mysql -u root -pnotmysql -e "GRANT ALL ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY 'notneutron';"
 mysql -u root -pnotmysql -e "GRANT ALL ON neutron.* TO 'neutron'@'%' IDENTIFIED BY 'notneutron';"
 
-sudo sed -i "s|connection = sqlite:////var/lib/neutron/neutron.sqlite|connection = mysql://neutron:notneutron@$MYSQL_IP/neutron|g" /etc/neutron/neutron.conf
-sudo sed -i "s/#rabbit_host=localhost/rabbit_host=$RABBITMQ_IP/g" /etc/neutron/neutron.conf
-sudo sed -i 's/# allow_overlapping_ips = False/allow_overlapping_ips = True/g' /etc/neutron/neutron.conf
-sudo sed -i 's/# service_plugins =/service_plugins = router/g' /etc/neutron/neutron.conf
-sudo sed -i 's/# auth_strategy = keystone/auth_strategy = keystone/g' /etc/neutron/neutron.conf
-sudo sed -i "s/auth_host = 127.0.0.1/auth_host = $KEYSTONE_IP/g" /etc/neutron/neutron.conf
-sudo sed -i 's/%SERVICE_TENANT_NAME%/Services/g' /etc/neutron/neutron.conf
-sudo sed -i 's/%SERVICE_USER%/neutron/g' /etc/neutron/neutron.conf
-sudo sed -i 's/%SERVICE_PASSWORD%/notneutron/g' /etc/neutron/neutron.conf
-sudo sed -i "s|# nova_url = http://127.0.0.1:8774\(\/v2\)\?|nova_url = http://$NOVA_IP:8774/v2|g" /etc/neutron/neutron.conf
-sudo sed -i "s/# nova_admin_username =/nova_admin_username = nova/g" /etc/neutron/neutron.conf
-sudo sed -i "s/# nova_admin_tenant_id =/nova_admin_tenant_id = $SERVICE_TENANT_ID/g" /etc/neutron/neutron.conf
-sudo sed -i "s/# nova_admin_password =/nova_admin_password = notnova/g" /etc/neutron/neutron.conf
-sudo sed -i "s|# nova_admin_auth_url =|nova_admin_auth_url = http://$KEYSTONE_IP:35357/v2.0|g" /etc/neutron/neutron.conf
+sed -i "s|connection = sqlite:////var/lib/neutron/neutron.sqlite|connection = mysql://neutron:notneutron@$MYSQL_IP/neutron|g" /etc/neutron/neutron.conf
+sed -i "s/#rabbit_host=localhost/rabbit_host=$RABBITMQ_IP/g" /etc/neutron/neutron.conf
+sed -i 's/# allow_overlapping_ips = False/allow_overlapping_ips = True/g' /etc/neutron/neutron.conf
+sed -i 's/# service_plugins =/service_plugins = router/g' /etc/neutron/neutron.conf
+sed -i 's/# auth_strategy = keystone/auth_strategy = keystone/g' /etc/neutron/neutron.conf
+sed -i "s/auth_host = 127.0.0.1/auth_host = $KEYSTONE_IP/g" /etc/neutron/neutron.conf
+sed -i 's/%SERVICE_TENANT_NAME%/Services/g' /etc/neutron/neutron.conf
+sed -i 's/%SERVICE_USER%/neutron/g' /etc/neutron/neutron.conf
+sed -i 's/%SERVICE_PASSWORD%/notneutron/g' /etc/neutron/neutron.conf
+sed -i "s|# nova_url = http://127.0.0.1:8774\(\/v2\)\?|nova_url = http://$NOVA_IP:8774/v2|g" /etc/neutron/neutron.conf
+sed -i "s/# nova_admin_username =/nova_admin_username = nova/g" /etc/neutron/neutron.conf
+sed -i "s/# nova_admin_tenant_id =/nova_admin_tenant_id = $SERVICE_TENANT_ID/g" /etc/neutron/neutron.conf
+sed -i "s/# nova_admin_password =/nova_admin_password = notnova/g" /etc/neutron/neutron.conf
+sed -i "s|# nova_admin_auth_url =|nova_admin_auth_url = http://$KEYSTONE_IP:35357/v2.0|g" /etc/neutron/neutron.conf
 
 
 # Configure Neutron ML2
-sudo sed -i 's|# type_drivers = local,flat,vlan,gre,vxlan|type_drivers = vlan,vxlan,flat|g' /etc/neutron/plugins/ml2/ml2_conf.ini
-sudo sed -i 's|# tenant_network_types = local|tenant_network_types = vlan,vxlan,flat|g' /etc/neutron/plugins/ml2/ml2_conf.ini
-sudo sed -i 's|# mechanism_drivers =|mechanism_drivers = linuxbridge,l2population|g' /etc/neutron/plugins/ml2/ml2_conf.ini
-sudo sed -i 's|# flat_networks =|flat_networks = physnet1|g' /etc/neutron/plugins/ml2/ml2_conf.ini
-sudo sed -i 's|# network_vlan_ranges =|network_vlan_ranges = phys-data:1000:1005|g' /etc/neutron/plugins/ml2/ml2_conf.ini
-sudo sed -i 's|# vni_ranges =|vni_ranges = 100:200|g' /etc/neutron/plugins/ml2/ml2_conf.ini
-sudo sed -i 's|# enable_security_group = True|firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver\nenable_security_group = True|g' /etc/neutron/plugins/ml2/ml2_conf.ini
+sed -i 's|# type_drivers = local,flat,vlan,gre,vxlan|type_drivers = vlan,vxlan,flat|g' /etc/neutron/plugins/ml2/ml2_conf.ini
+sed -i 's|# tenant_network_types = local|tenant_network_types = vlan,vxlan,flat|g' /etc/neutron/plugins/ml2/ml2_conf.ini
+sed -i 's|# mechanism_drivers =|mechanism_drivers = linuxbridge,l2population|g' /etc/neutron/plugins/ml2/ml2_conf.ini
+sed -i 's|# flat_networks =|flat_networks = physnet1|g' /etc/neutron/plugins/ml2/ml2_conf.ini
+sed -i 's|# network_vlan_ranges =|network_vlan_ranges = phys-data:1000:1005|g' /etc/neutron/plugins/ml2/ml2_conf.ini
+sed -i 's|# vni_ranges =|vni_ranges = 100:200|g' /etc/neutron/plugins/ml2/ml2_conf.ini
+sed -i 's|# enable_security_group = True|firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver\nenable_security_group = True|g' /etc/neutron/plugins/ml2/ml2_conf.ini
 
 # Configure Neutron ML2 continued...
-( cat | sudo tee -a /etc/neutron/plugins/ml2/ml2_conf.ini ) <<EOF
+( cat | tee -a /etc/neutron/plugins/ml2/ml2_conf.ini ) <<EOF
 
 [agent]
 tunnel_types = vxlan
@@ -305,17 +305,17 @@ local_ip = $MY_IP
 l2_population = True
 EOF
 
-sudo neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade juno
+neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade juno
 
-sudo service neutron-server start
+service neutron-server start
 sleep 15
 
 ### Cinder
 
-sudo apt-get install -y cinder-api cinder-scheduler
+apt-get install -y cinder-api cinder-scheduler
 
-sudo service cinder-api stop
-sudo service cinder-scheduler stop
+service cinder-api stop
+service cinder-scheduler stop
 
 source ~/credentials/admin
 
@@ -332,7 +332,7 @@ mysql -u root -pnotmysql -e "CREATE DATABASE cinder;"
 mysql -u root -pnotmysql -e "GRANT ALL ON cinder.* TO 'cinder'@'localhost' IDENTIFIED BY 'notcinder';"
 mysql -u root -pnotmysql -e "GRANT ALL ON cinder.* TO 'cinder'@'%' IDENTIFIED BY 'notcinder';"
 
-( cat | sudo tee -a /etc/cinder/cinder.conf ) <<EOF
+( cat | tee -a /etc/cinder/cinder.conf ) <<EOF
 my_ip = $MY_IP
 rabbit_host = $RABBITMQ_IP
 glance_host = $GLANCE_IP
@@ -363,10 +363,10 @@ admin_user = cinder
 admin_password = notcinder
 EOF
 
-sudo cinder-manage db sync
+cinder-manage db sync
 
-sudo service cinder-scheduler start
-sudo service cinder-api start
+service cinder-scheduler start
+service cinder-api start
 sleep 15
 
 export OS_USERNAME=cinder
@@ -388,6 +388,6 @@ unset OS_REGION_NAME
 
 ### Horizon
 
-sudo apt-get install -y --no-install-recommends memcached openstack-dashboard
+apt-get install -y --no-install-recommends memcached openstack-dashboard
 
-sudo service apache2 restart
+service apache2 restart
