@@ -34,11 +34,11 @@ ntpdate -u ntp.ubuntu.com | true
 
 ### Juno (run these one at a time)
 
+apt-get update
+
 apt-get install -y ubuntu-cloud-keyring software-properties-common
  
 add-apt-repository -y cloud-archive:juno
-
-apt-get update
 
 ### Neutron
 
