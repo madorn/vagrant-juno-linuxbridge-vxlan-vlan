@@ -28,13 +28,13 @@ fi
 
 ### Synchronize time
 
+apt-get update
+
 ntpdate -u ntp.ubuntu.com | true
 
 apt-get install -y ubuntu-cloud-keyring software-properties-common
 
 add-apt-repository -y cloud-archive:juno
-
-apt-get update
 
 ### Neutron
 
