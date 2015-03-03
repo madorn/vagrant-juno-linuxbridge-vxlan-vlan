@@ -58,6 +58,8 @@ apt-get install -y ubuntu-cloud-keyring software-properties-common
 
 add-apt-repository -y cloud-archive:juno
 
+apt-get update
+
 ### RabbitMQ
 
 apt-get install -y rabbitmq-server
