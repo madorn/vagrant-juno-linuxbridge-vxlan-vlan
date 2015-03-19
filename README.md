@@ -24,6 +24,8 @@ Verify that you have default host-only vboxnet0 network (192.168.56.0/24) <br />
 
 ``vagrant up --provider virtualbox --provision``
 
+# Note: VLAN tags will not currently work with the VirtualBox Intel PRO/1000 Adapter Type
+
 **For VMware Fusion** <br />
 Verify that you have default host-only vmnet1 network (172.16.99.0/24) <br />
 
