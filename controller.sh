@@ -278,7 +278,7 @@ sed -i "s|# nova_admin_auth_url =|nova_admin_auth_url = http://$KEYSTONE_IP:3535
 
 # Configure Neutron ML2
 sed -i 's|# type_drivers = local,flat,vlan,gre,vxlan|type_drivers = vlan,vxlan,flat|g' /etc/neutron/plugins/ml2/ml2_conf.ini
-sed -i 's|# tenant_network_types = local|tenant_network_types = vlan,vxlan,flat|g' /etc/neutron/plugins/ml2/ml2_conf.ini
+sed -i 's|# tenant_network_types = local|tenant_network_types = vxlan,vlan,flat|g' /etc/neutron/plugins/ml2/ml2_conf.ini
 sed -i 's|# mechanism_drivers =|mechanism_drivers = linuxbridge,l2population|g' /etc/neutron/plugins/ml2/ml2_conf.ini
 sed -i 's|# flat_networks =|flat_networks = physnet1|g' /etc/neutron/plugins/ml2/ml2_conf.ini
 sed -i 's|# network_vlan_ranges =|network_vlan_ranges = phys-data:1000:1005|g' /etc/neutron/plugins/ml2/ml2_conf.ini
